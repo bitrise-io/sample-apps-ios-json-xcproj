@@ -12,9 +12,10 @@ steps) to read and write that format. The format is described by
 - SwiftUI app in an `.xcodeproj` holding `project.xcproj` (JWCC: JSON with comments and
   trailing commas).
 - Three targets:
-  - `sample-apps-ios-json-xcproj`, the app (a single "Hello, world!" screen).
-  - `sample-apps-ios-json-xcprojTests`, unit-test bundle.
-  - `sample-apps-ios-json-xcprojUITests`, UI-test bundle.
+  - `sample-apps-ios-json-xcproj`, the app (one screen: a slider, a "Hit me" button and a score).
+  - `sample-apps-ios-json-xcprojTests`, unit tests, written with Swift Testing.
+  - `sample-apps-ios-json-xcprojUITests`, UI tests, written with XCTest.
+- Swift 6 language mode, SwiftUI, and the Observation framework.
 - iOS deployment target 27.2.
 - Created with Xcode 27.2 beta (27B5028f). Only Xcode 27.2 and newer can write this format;
   Xcode 27.0 cannot.
@@ -41,14 +42,27 @@ covers:
   reachable only through a synchronized folder, not through a resources build phase.
 - **Project-wide `default-configuration`**, set to `Release`. There is no per-target default.
 - **Automatic code signing** with a `DEVELOPMENT_TEAM` build setting.
+- **Autocreated schemes.** No scheme is checked in and `WorkspaceSettings.xcsettings` is absent.
 
-## Not covered yet
+## App and tests
 
-Known gaps, listed so nobody assumes coverage that is not here:
+`GuessingGame` is an `@Observable` class holding a target value, a round number and a score.
+`check(guess:)` scores a round as `100 - abs(target - guess)` and adds it to the total. The target
+is passed into the initialiser and into `startNewRound(targetValue:)`, defaulting to a random
+value, so tests pin it and never have to stub randomness.
 
-- No **shared scheme**. Xcode auto-creates the scheme, so nothing resolves a scheme by name from
-  a clean checkout.
-- No **manual code signing**, so no `legacy-team-id` or `legacy-provisioning-style` keys.
-- No `specialized-configurations`, `required-capabilities`, `packages` or `imported-products`.
-- No **app clip** or **framework** target, and no app extension.
-- No reference by `id:`, and no `FilePath` base other than `<PRODUCTS>`.
+`ContentView` is SwiftUI, holding the game in `@State`. Every control carries an
+`.accessibilityIdentifier`, which is what the UI tests query on; SwiftUI's generated labels are not
+stable enough to key on.
+
+Three Swift Testing cases cover the scoring, including one with a display name and one in a nested
+`@Suite`. Two XCTest cases drive the app. The split is forced, not a preference: `XCUIApplication`
+can only be driven from XCTest. It is also useful, because one run then reports results from both
+frameworks.
+
+The app target runs with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, so the model is main-actor
+isolated. The test targets do not, so the suites are marked `@MainActor`, the nested one separately
+because nested types do not inherit the outer suite's isolation.
+
+Sources live in synchronized folders, so adding or removing Swift files never touches
+`project.xcproj`. Only a build setting or a new target changes it.
