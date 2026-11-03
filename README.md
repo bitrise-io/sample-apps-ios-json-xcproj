@@ -38,8 +38,13 @@ covers:
 - **A `group` reference tree.** The `Products` group resolves each target's `product` by name
   path, using the `<PRODUCTS>` path base.
 - **Local target dependencies** in the bare-string form, plus `test-host-target`.
-- **An asset catalog** (`Assets.xcassets` with `AppIcon.appiconset` and `AccentColor.colorset`)
-  reachable only through a synchronized folder, not through a resources build phase.
+- **Asset catalogs reached in two ways.**
+  - `Assets.xcassets` (with `AppIcon.appiconset` and `AccentColor.colorset`) sits in the app's
+    synchronized folder, so no file entry names it.
+  - `Branding/Icons/Icons.xcassets` (with `AlternateIcon.appiconset`) is an explicit file
+    reference inside two nested `group` entries, `Branding` and `Icons`, each with its own
+    `path`. It is not at the project root. Its `target-membership` names a build phase,
+    `sample-apps-ios-json-xcproj/resources`, where the synchronized folders name only the target.
 - **Project-wide `default-configuration`**, set to `Release`. There is no per-target default.
 - **Automatic code signing** with a `DEVELOPMENT_TEAM` build setting.
 - **Autocreated schemes.** No scheme is checked in and `WorkspaceSettings.xcsettings` is absent.

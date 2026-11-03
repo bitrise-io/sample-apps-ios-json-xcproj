@@ -11,6 +11,19 @@
     ],
   },
   "files": [
+    {
+      "kind": "group",
+      "path": "Branding",
+      "children": [
+        {
+          "kind": "group",
+          "path": "Icons",
+          "children": [
+            { "path": "Icons.xcassets", "target-membership": [ "sample-apps-ios-json-xcproj/resources" ] },
+          ],
+        },
+      ],
+    },
     { "kind": "folder", "path": "sample-apps-ios-json-xcproj", "target-membership": [ "sample-apps-ios-json-xcproj" ] },
     { "kind": "folder", "path": "sample-apps-ios-json-xcprojTests", "target-membership": [ "sample-apps-ios-json-xcprojTests" ] },
     { "kind": "folder", "path": "sample-apps-ios-json-xcprojUITests", "target-membership": [ "sample-apps-ios-json-xcprojUITests" ] },
